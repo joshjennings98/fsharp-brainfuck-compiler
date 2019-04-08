@@ -51,17 +51,16 @@ let compile (input : Token list) : string =
     | (RBracket, i) -> failwithf "Not yet implemented."
     | (IncrementPointer, i) -> 
       pointer <- i + pointer 
-      sprintf "; Increment pointer by %A. Pointer now at %A. \nLDR R0, =0x%A \n" i pointer (pointer.ToString("X"))
+      sprintf "; Increment pointer by %A. Pointer now at 0x%A. \nLDR R0, =0x%A \n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
     | (DecrementPointer, i) -> 
       pointer <- pointer - i 
-      sprintf "; Decrement pointer by %A. Pointer now at %A. \nLDR R0, =0x%A \n" i pointer (pointer.ToString("X"))
+      sprintf "; Decrement pointer by %A. Pointer now at 0x%A. \nLDR R0, =0x%A \n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
     | (IncrementCell, i) -> 
-      sprintf "; Increment cell at memory location 0x%A by %A. \nLDR R1, [R0] \nADD R1, R1, 0x%A \nSTR R1, [R0] \n" (pointer.ToString("X")) i (i.ToString("X")) //Check what memory locations go up in
+      sprintf "; Increment cell 0x%A by %A. \nLDR R1, [R0] \nADD R1, R1, 0x%A \nSTR R1, [R0] \n" pointer i (i.ToString("X")) //Check what memory locations go up in
     | (DecrementCell, i) -> 
-      sprintf "; Decrement cell at memory location 0x%A by %A. \nLDR R1, [R0] \nSUB R1, R1, 0x%A \nSTR R1, [R0] \n" (pointer.ToString("X")) i (i.ToString("X")) //Check what memory locations go up in
+      sprintf "; Decrement cell %A by %A. \nLDR R1, [R0] \nSUB R1, R1, 0x%A \nSTR R1, [R0] \n" pointer i (i.ToString("X")) //Check what memory locations go up in
     | (WriteChar, i) -> failwithf "Not yet implemented."
     | (GetChar, i) -> failwithf "Not yet implemented."
-    | _ ->failwithf "Will never happen."
   input 
   |> List.map (fun el -> compileInstruction el)
   |> List.reduce (+)
