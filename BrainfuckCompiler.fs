@@ -1,8 +1,15 @@
 module BrainfuckCompiler
+
 (*
+This code is purposefully written quite verbosely since brainfuck compilers have been made that are only 100 - 200 bytes so there is no point in making it super small, may as well make it readable.
+
 To Do: 
 - Probably account for wrapping of bytes
 - Implement compilation for getting inputs and outputs
+- Add pointer initialisation so it begins after the start of where the code is stored
+- Add extra stuff needed for arm assembly like import I/O stuff?
+- Add compile arguments for brainfuck such as cell size, wrapping options, etc.
+- Turn into something actually usable without just modifying the test variable at the bottom of the file
 *)
 
 type SyntaxError =
@@ -64,17 +71,17 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
     | (LBracket, i) -> 
       loopNumber <- loopNumber + 1
       loopStack <- [loopNumber] @ loopStack
-      sprintf "; If byte in cell %A = 0 then goto to instruction after 'EXIT%A' \nENTER%A \nLDR R1, R0 \nCMP R1, #0 \nBLE EXIT%A \n\n" pointer loopNumber loopNumber loopNumber
+      sprintf "; If byte in cell %A = 0 then goto to instruction after 'EXIT%A' \nENTER%A \nLDR R1, [R0] \nCMP R1, #0 \nBLE EXIT%A \n\n" pointer loopNumber loopNumber loopNumber
     | (RBracket, i) -> 
       let currentLoopValue = loopStack.Head
       loopStack <- loopStack.Tail
       sprintf "; Goto to 'ENTER%A' \nB ENTER%A \nEXIT%A \n\n" currentLoopValue currentLoopValue currentLoopValue
     | (IncrementPointer, i) -> 
       pointer <- i + pointer 
-      sprintf "; Increment pointer by %A. Pointer now at 0x%A. \nLDR R0, =0x%A \n\n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
+      sprintf "; Increment pointer by %A. Pointer now at 0x%A. \nLDR R0, 0x%A \n\n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
     | (DecrementPointer, i) -> 
       pointer <- pointer - i 
-      sprintf "; Decrement pointer by %A. Pointer now at 0x%A. \nLDR R0, =0x%A \n\n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
+      sprintf "; Decrement pointer by %A. Pointer now at 0x%A. \nLDR R0, 0x%A \n\n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
     | (IncrementCell, i) -> 
       sprintf "; Increment cell %A by %A. \nLDR R1, [R0] \nADD R1, R1, #0x%A \nSTR R1, [R0] \n\n" pointer i (i.ToString("X")) //Check what memory locations go up in
     | (DecrementCell, i) -> 
@@ -94,6 +101,7 @@ let test =
   |> tokenise 
   |> compile
 
-printf "%A" test
-
+match test with
+| Ok x -> printf "%A \n" x
+| Error e -> printf "Error: %A \n" e
   
