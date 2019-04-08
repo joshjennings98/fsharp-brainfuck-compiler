@@ -10,6 +10,7 @@ To Do:
 - Add extra stuff needed for arm assembly like import I/O stuff?
 - Add compile arguments for brainfuck such as cell size, wrapping options, etc.
 - Turn into something actually usable without just modifying the test variable at the bottom of the file
+- Do a write up in the readme
 *)
 
 type SyntaxError =
