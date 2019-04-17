@@ -9,7 +9,7 @@ To Do:
 - Add pointer initialisation so it begins after the start of where the code is stored
 - Add extra stuff needed for arm assembly like import I/O stuff?
 - Add compile arguments for brainfuck such as cell size, wrapping options, etc.
-- Turn into something actually usable without just modifying the test variable at the bottom of the file
+- Turn into something actually usable without just modifying the \tvariable at the bottom of the file
 - Do a write up in the readme
 - Maybe convert tuples to 'of int'
 *)
@@ -145,48 +145,47 @@ let optimise (input : Instruction list) : Result<Token list, SyntaxError> =
   then tokenList |> Ok
   else ``Unclosed brackets`` |> Error
 
-
-
-
 let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxError> =
   let mutable pointer = 0
-  let mutable loopNumber = 0
-  let mutable loopStack = []
+  let mutable indentation = 1
   let compileInstruction (token : Token) = 
     match token with
     | (LBracket, i) -> 
-      loopNumber <- loopNumber + 1
-      loopStack <- [loopNumber] @ loopStack
-      sprintf "; If byte in cell %A = 0 then goto to instruction after 'EXIT%A' \nENTER%A \nLDR R1, [R0] \nCMP R1, #0 \nBLE EXIT%A \n\n" pointer loopNumber loopNumber loopNumber
+      indentation <- indentation + 1
+      sprintf "%Awhile (*ptr) { \n" (List.init (indentation - 1) (fun el -> "\t") |> List.reduce (+))
     | (RBracket, i) -> 
-      let currentLoopValue = loopStack.Head
-      loopStack <- loopStack.Tail
-      sprintf "; Goto to 'ENTER%A' \nB ENTER%A \nEXIT%A \n\n" currentLoopValue currentLoopValue currentLoopValue
+      indentation <- indentation - 1
+      sprintf "%A} \n" (List.init (indentation + 1) (fun el -> "\t") |> List.reduce (+))
     | (IncrementPointer, i) -> 
-      pointer <- i + pointer 
-      sprintf "; Increment pointer by %A. Pointer now at 0x%A. \nLDR R0, 0x%A \n\n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
+      pointer <- pointer + i
+      sprintf "%Aptr += %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) i 
     | (DecrementPointer, i) -> 
-      pointer <- pointer - i 
-      sprintf "; Decrement pointer by %A. Pointer now at 0x%A. \nLDR R0, 0x%A \n\n" i ((256 * pointer).ToString("X")) ((256 * pointer).ToString("X"))
+      pointer <- pointer - i
+      sprintf "%Aptr -= %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) i 
     | (IncrementCell, i) -> 
-      sprintf "; Increment cell %A by %A. \nLDR R1, [R0] \nADD R1, R1, #0x%A \nSTR R1, [R0] \n\n" pointer i (i.ToString("X")) //Check what memory locations go up in
+      sprintf "%Aptr[%A] += %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) pointer i
     | (DecrementCell, i) -> 
-      sprintf "; Decrement cell %A by %A. \nLDR R1, [R0] \nSUB R1, R1, #0x%A \nSTR R1, [R0] \n\n" pointer i (i.ToString("X")) //Check what memory locations go up in
-    | (WriteChar, i) -> failwithf "Not yet implemented."
-    | (GetChar, i) -> failwithf "Not yet implemented."
+      sprintf "%Aptr[%A] -= %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) pointer i
+    | (WriteChar, i) -> sprintf "%Aputchar(*ptr); \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+))
+    | (GetChar, i) -> sprintf "%A*ptr = getchar(); \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+))
+    | (Set x, y) -> sprintf "%Aptr[%A] = %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + y) x
+    | (Add (x, y), z) -> sprintf "%Aptr[%A] += %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + x) y
+    | (Sub (x, y), z) -> sprintf "%Aptr[%A] -= %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + x) y
   match input with
   | Ok x ->
     x 
     |> List.map (fun el -> compileInstruction el)
+    |> List.append ["#include <stdio.h> \n\n"; "#define SIZE 30000 \n\n"; "int main(void) { \n"; "\tchar array[SIZE] = {0}; \n"; "\tchar *ptr = array; \n\n"]
     |> List.reduce (+)
+    |> fun el -> el + "\n\treturn 0; \n} \n"
     |> Ok
   | Error e -> e |> Error
 
 let test = 
-  ">>><<<<<<++---[---]-->"
+  ">+>->"
   |> tokenise
   |> optimise 
-  //|> compile
+  |> compile
 
 printf "%A \n" test
   
