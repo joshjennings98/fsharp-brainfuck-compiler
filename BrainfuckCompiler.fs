@@ -3,15 +3,11 @@ module BrainfuckCompiler
 (*
 This code is purposefully written quite verbosely since brainfuck compilers have been made that are only 100 - 200 bytes so there is no point in making it super small, may as well make it readable.
 
-To Do: 
+Todo:
 - Probably account for wrapping of bytes
-- Implement compilation for getting inputs and outputs
-- Add pointer initialisation so it begins after the start of where the code is stored
-- Add extra stuff needed for arm assembly like import I/O stuff?
-- Add compile arguments for brainfuck such as cell size, wrapping options, etc.
-- Turn into something actually usable without just modifying the \tvariable at the bottom of the file
+- Add compile arguments for brainfuck such as array size.
+- Turn into something actually usable without just modifying the test variable at the bottom of the file
 - Do a write up in the readme
-- Maybe convert tuples to 'of int'
 *)
 
 type SyntaxError =
@@ -31,6 +27,8 @@ type Instruction =
   | Set of int //Set cell at pointer to first int
 
 type Token = Instruction * int
+
+let optimiseCode = false
 
 let tokenise (input : string) : Instruction list =
   let mutable openBrackets = 0
@@ -130,12 +128,19 @@ let optimise (input : Instruction list) : Result<Token list, SyntaxError> =
     | _ -> x
   let tokenList = 
     []
-    |> List.foldBack concatIncrDecr input
-    |> mergeSuccessiveIncrDecr
-    |> simplifyAddSub
-    |> removeBeforeSet
-    |> List.map fixIncrDecr
-    |> List.filter (fun el -> (el |> snd) <> 0)
+    |> fun el ->
+       match optimiseCode with
+       | true -> 
+         el
+         |> List.foldBack concatIncrDecr input
+         |> mergeSuccessiveIncrDecr
+         |> simplifyAddSub
+         |> removeBeforeSet
+         |> List.map fixIncrDecr
+         |> List.filter (fun el -> (el |> snd) <> 0)
+       | false -> 
+         input
+         |> List.map (fun el -> (el, 1))
   if (List.fold (fun acc el -> 
     match (el |> fst) with 
     | LBracket -> acc + 1 
@@ -184,7 +189,7 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
 let test = 
   ">+>->"
   |> tokenise
-  |> optimise 
+  |> optimise
   |> compile
 
 printf "%A \n" test
