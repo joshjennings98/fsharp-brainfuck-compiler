@@ -8,4 +8,5 @@ To Do:
 * Add compile arguments for brainfuck such as array size.
 * Turn into something actually usable without just modifying the test variable at the bottom of the file
 * Do a write up in the readme
+* **Turn into proper f# program.**
 
