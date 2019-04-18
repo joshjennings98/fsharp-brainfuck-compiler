@@ -1,14 +1,16 @@
-module BrainfuckCompiler
+module BrainfuckTranspiler
 
 (*
-This code is purposefully written quite verbosely since brainfuck compilers have been made that are only 100 - 200 bytes so there is no point in making it super small, may as well make it readable.
+This code is purposefully written quite verbosely since brainfuck compilers have been made that are only 100 - 200 bytes so there is no point in making it super small.
 
 Todo:
-- Probably account for wrapping of bytes
+- Account for wrapping of bytes
 - Add compile arguments for brainfuck such as array size.
 - Turn into something actually usable without just modifying the test variable at the bottom of the file
-- Do a write up in the readme
+- Add more optimisations.
 *)
+
+//module Types
 
 type SyntaxError =
   | ``Unclosed brackets``
@@ -28,7 +30,9 @@ type Instruction =
 
 type Token = Instruction * int
 
-let optimiseCode = false
+let optimiseCode = true
+
+//module Tokeniser
 
 let tokenise (input : string) : Instruction list =
   let mutable openBrackets = 0
@@ -50,6 +54,8 @@ let tokenise (input : string) : Instruction list =
   |> Seq.toList 
   |> filterByList validChars 
   |> List.map toInstruction
+
+//module Optimiser
 
 let optimise (input : Instruction list) : Result<Token list, SyntaxError> =
   let concatIncrDecr (x : Instruction) = function
@@ -150,6 +156,8 @@ let optimise (input : Instruction list) : Result<Token list, SyntaxError> =
   then tokenList |> Ok
   else ``Unclosed brackets`` |> Error
 
+//module Compiler
+
 let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxError> =
   let mutable pointer = 0
   let mutable indentation = 1
@@ -173,7 +181,7 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
       sprintf "%Aptr[%A] -= %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) pointer i
     | (WriteChar, i) -> sprintf "%Aputchar(*ptr); \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+))
     | (GetChar, i) -> sprintf "%A*ptr = getchar(); \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+))
-    | (Set x, y) -> sprintf "%Aptr[%A] = %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + y) x
+    | (Set x, y) -> sprintf "%Aptr[%A] = %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + y - 1) x
     | (Add (x, y), z) -> sprintf "%Aptr[%A] += %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + x) y
     | (Sub (x, y), z) -> sprintf "%Aptr[%A] -= %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + x) y
   match input with
@@ -186,8 +194,10 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
     |> Ok
   | Error e -> e |> Error
 
+//main()
+
 let test = 
-  ">+>->"
+  ">[-+---]"
   |> tokenise
   |> optimise
   |> compile
