@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsharp-brainfuck-to-c", "fsharp-brainfuck-to-c\fsharp-brainfuck-to-c.fsproj", "{D22D2546-5CA1-4608-B74E-DEE123696ADB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D22D2546-5CA1-4608-B74E-DEE123696ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D22D2546-5CA1-4608-B74E-DEE123696ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D22D2546-5CA1-4608-B74E-DEE123696ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D22D2546-5CA1-4608-B74E-DEE123696ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5FC80EF2-B067-4197-8226-A765D01D5E5F}
+	EndGlobalSection
+EndGlobal

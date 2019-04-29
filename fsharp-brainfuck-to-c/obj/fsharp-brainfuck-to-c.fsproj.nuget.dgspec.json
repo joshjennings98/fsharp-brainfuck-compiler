@@ -1,0 +1,58 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c.fsproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c.fsproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c.fsproj",
+        "projectName": "fsharp-brainfuck-to-c",
+        "projectPath": "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c.fsproj",
+        "packagesPath": "C:\\Users\\Josh\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-to-c\\fsharp-brainfuck-to-c\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Josh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.1": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.1": {
+          "dependencies": {
+            "FSharp.Core": {
+              "target": "Package",
+              "version": "[4.6.2, )"
+            },
+            "Microsoft.NETCore.App": {
+              "target": "Package",
+              "version": "[2.1.0, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    }
+  }
+}

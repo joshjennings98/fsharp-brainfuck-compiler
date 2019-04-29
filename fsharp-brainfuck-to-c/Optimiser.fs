@@ -1,63 +1,12 @@
-module BrainfuckTranspiler
-
-(*
-This code is purposefully written quite verbosely since brainfuck compilers have been made that are only 100 - 200 bytes so there is no point in making it super small.
-
-Todo:
-- Account for wrapping of bytes
-- Add compile arguments for brainfuck such as array size.
-- Turn into something actually usable without just modifying the test variable at the bottom of the file
-- Add more optimisations.
+﻿(*
+Module for applying various optimisations to the initial token list. See README for details.
 *)
 
-//module Types
+module Optimiser
 
-type SyntaxError =
-  | ``Unclosed brackets``
+open Types
 
-type Instruction =
-  | LBracket
-  | RBracket
-  | IncrementPointer
-  | DecrementPointer
-  | IncrementCell
-  | DecrementCell
-  | WriteChar
-  | GetChar
-  | Add of int * int //Add second int to (pointer location + first int)
-  | Sub of int * int //Subtract second int to (pointer location + first int)
-  | Set of int //Set cell at pointer to first int
-
-type Token = Instruction * int
-
-let optimiseCode = true
-
-//module Tokeniser
-
-let tokenise (input : string) : Instruction list =
-  let mutable openBrackets = 0
-  let validChars = ['['; ']';'>'; '<'; '+'; '-'; '.'; ',']
-  let filterByList (list : 'a list) (input : 'a list) : 'a list = 
-    List.filter (fun el1 -> (List.exists (fun el2 -> el2 = el1) list)) input
-  let toInstruction (x : char) : Instruction =
-    match x with
-    | '[' -> LBracket
-    | ']' -> RBracket
-    | '>' -> IncrementPointer
-    | '<' -> DecrementPointer
-    | '+' -> IncrementCell
-    | '-' -> DecrementCell
-    | '.' -> WriteChar
-    | ',' -> GetChar
-    | _ -> failwithf "Won't happen since all other characters are filtered out prior to this being called."
-  input 
-  |> Seq.toList 
-  |> filterByList validChars 
-  |> List.map toInstruction
-
-//module Optimiser
-
-let optimise (input : Instruction list) : Result<Token list, SyntaxError> =
+let optimise (optimiseCode : bool) (input : Instruction list) : Result<Token list, SyntaxError> =
   let concatIncrDecr (x : Instruction) = function
     | (i, count) :: t when i = x && i <> LBracket && i <> RBracket -> (i, count + 1) :: t 
     | t -> (x, 1) :: t
@@ -155,52 +104,3 @@ let optimise (input : Instruction list) : Result<Token list, SyntaxError> =
   ) 0 tokenList) = 0
   then tokenList |> Ok
   else ``Unclosed brackets`` |> Error
-
-//module Compiler
-
-let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxError> =
-  let mutable pointer = 0
-  let mutable indentation = 1
-  let compileInstruction (token : Token) = 
-    match token with
-    | (LBracket, i) -> 
-      indentation <- indentation + 1
-      sprintf "%Awhile (*ptr) { \n" (List.init (indentation - 1) (fun el -> "\t") |> List.reduce (+))
-    | (RBracket, i) -> 
-      indentation <- indentation - 1
-      sprintf "%A} \n" (List.init (indentation + 1) (fun el -> "\t") |> List.reduce (+))
-    | (IncrementPointer, i) -> 
-      pointer <- pointer + i
-      sprintf "%Aptr += %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) i 
-    | (DecrementPointer, i) -> 
-      pointer <- pointer - i
-      sprintf "%Aptr -= %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) i 
-    | (IncrementCell, i) -> 
-      sprintf "%Aptr[%A] += %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) pointer i
-    | (DecrementCell, i) -> 
-      sprintf "%Aptr[%A] -= %A; \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) pointer i
-    | (WriteChar, i) -> sprintf "%Aputchar(*ptr); \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+))
-    | (GetChar, i) -> sprintf "%A*ptr = getchar(); \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+))
-    | (Set x, y) -> sprintf "%Aptr[%A] = %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + y - 1) x
-    | (Add (x, y), z) -> sprintf "%Aptr[%A] += %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + x) y
-    | (Sub (x, y), z) -> sprintf "%Aptr[%A] -= %A \n" (List.init (indentation) (fun el -> "\t") |> List.reduce (+)) (pointer + x) y
-  match input with
-  | Ok x ->
-    x 
-    |> List.map (fun el -> compileInstruction el)
-    |> List.append ["#include <stdio.h> \n\n"; "#define SIZE 30000 \n\n"; "int main(void) { \n"; "\tchar array[SIZE] = {0}; \n"; "\tchar *ptr = array; \n\n"]
-    |> List.reduce (+)
-    |> fun el -> el + "\n\treturn 0; \n} \n"
-    |> Ok
-  | Error e -> e |> Error
-
-//main()
-
-let test = 
-  ">[-+---]"
-  |> tokenise
-  |> optimise
-  |> compile
-
-printf "%A \n" test
-  

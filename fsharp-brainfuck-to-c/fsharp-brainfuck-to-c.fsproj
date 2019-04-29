@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>fsharp_brainfuck_to_c</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Tokeniser.fs" />
+    <Compile Include="Optimiser.fs" />
+    <Compile Include="Compiler.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>
