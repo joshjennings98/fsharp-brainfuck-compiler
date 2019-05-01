@@ -23,5 +23,6 @@ let main argv =
         |> optimise true
         |> compile
     printf "%A \n" test
-
+    
+    System.Console.ReadKey() |> ignore
     0 // return an integer exit code
