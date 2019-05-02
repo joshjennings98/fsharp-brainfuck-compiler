@@ -1,24 +1,24 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1",
-    "signature": "6276bef5f7df044c25079fb0397a18e9c2f30a34"
+    "signature": "2a3cce40ffad1aed363051b9051c2ff156f5fe39"
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.1": {
       "fsharp-brainfuck-to-c/1.0.0": {
         "dependencies": {
-          "FSharp.Core": "4.6.2"
+          "FSharp.Core": "4.5.2"
         },
         "runtime": {
           "fsharp-brainfuck-to-c.dll": {}
         }
       },
-      "FSharp.Core/4.6.2": {
+      "FSharp.Core/4.5.2": {
         "runtime": {
           "lib/netstandard1.6/FSharp.Core.dll": {
-            "assemblyVersion": "4.6.0.0",
-            "fileVersion": "2019.2.13.3"
+            "assemblyVersion": "4.5.0.0",
+            "fileVersion": "2018.7.27.2"
           }
         },
         "resources": {
@@ -74,12 +74,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "FSharp.Core/4.6.2": {
+    "FSharp.Core/4.5.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-/waJ3a7u7MjFOGnXOfokbG1N1FH7VCmP3Fw1tJ8Q75kIj60LYBL3eYzab9hDimL5E21uhQ/1wf04M3dRAYemlw==",
-      "path": "fsharp.core/4.6.2",
-      "hashPath": "fsharp.core.4.6.2.nupkg.sha512"
+      "sha512": "sha512-Pe3EDp9oBjQ3c3fvZAJsw7XFLHECS3zn3P7MSqsJy3sFYR6jvTgxxnCFeePR1JHiWyZ3bm+RZAjchqVYk61adA==",
+      "path": "fsharp.core/4.5.2",
+      "hashPath": "fsharp.core.4.5.2.nupkg.sha512"
     }
   }
 }

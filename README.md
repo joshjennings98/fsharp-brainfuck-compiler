@@ -45,7 +45,6 @@ This module is the entrance to the program. This module interprets any input arg
 **To Do:** 
 * Account for wrapping of bytes.
 * Add compile arguments for brainfuck such as array size.
-* Turn into a solution or something actually usable that isn't just modifying the test variable at the bottom of the file. 
-* Finish readme.
+* Add file input and output rather than just terminal input.
 * Add more optimisations.
 
