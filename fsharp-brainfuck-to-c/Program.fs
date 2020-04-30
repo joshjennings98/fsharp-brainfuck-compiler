@@ -26,7 +26,7 @@ let main argv =
         | 2 -> 
             if IO.File.Exists (argv.[1] + ".bf")
             then IO.File.ReadAllText (argv.[1] + ".bf"), true
-            else failwithf "%A.bf does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
+            else failwithf "%s.bf does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
         | _ -> failwithf "You must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n"
     
     input
@@ -39,9 +39,8 @@ let main argv =
             | true ->
                 code
                 |> fun asm -> 
-                    let compileMessage = sprintf "Compiled " + string argv.[1] + ".bf to " + string argv.[1] + ".s"
                     IO.File.WriteAllLines (@"" + argv.[1] + ".s", [asm])
-                    printfn "%s" compileMessage
+                printfn "Compiled %s.bf to %s.s" argv.[1] argv.[1]
             | false ->
                 Console.Write("\n")
                 printfn "%A" code
