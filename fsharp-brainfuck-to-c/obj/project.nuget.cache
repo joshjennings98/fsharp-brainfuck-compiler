@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "dpqK7xLPMNN9hVZlUvg1uzv3vTVYjLgVjXtehIJpB5IorlRzf/n8X85n0z9IFsNXYnsONRZjQDyB2OuCjISzww==",
+  "success": true,
+  "projectFilePath": "/home/josh/fsharp-brainfuck-to-C/fsharp-brainfuck-to-c/fsharp-brainfuck-to-c.fsproj",
+  "expectedPackageFiles": [
+    "/home/josh/.nuget/packages/fsharp.core/4.7.0/fsharp.core.4.7.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/microsoft.netcore.app/2.1.0/microsoft.netcore.app.2.1.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/microsoft.netcore.dotnetapphost/2.1.0/microsoft.netcore.dotnetapphost.2.1.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/microsoft.netcore.dotnethostpolicy/2.1.0/microsoft.netcore.dotnethostpolicy.2.1.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/microsoft.netcore.dotnethostresolver/2.1.0/microsoft.netcore.dotnethostresolver.2.1.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/microsoft.netcore.platforms/2.1.0/microsoft.netcore.platforms.2.1.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/microsoft.netcore.targets/2.1.0/microsoft.netcore.targets.2.1.0.nupkg.sha512",
+    "/home/josh/.nuget/packages/netstandard.library/2.0.3/netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
