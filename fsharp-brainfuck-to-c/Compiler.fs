@@ -10,44 +10,162 @@ open Types
 
 let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxError> =
     let mutable ptr = 0
+    let mutable ctr = 1
+    let mutable nesting = 0
+    let mutable labels = []
 
-    let mutable nesting = 1
+    let compileLB (_ : unit) = 
+        nesting <- nesting + 2
+        labels <- List.append labels [ctr; ctr+1]
+        ctr <- ctr + 2
+        [
+            ".L" + (string labels.[nesting-2]) + ":\n";
+            "movq    -8(%rbp), %rax\n";
+            "movzbl  (%rax), %eax\n";
+            "testb   %al, %al\n";
+            "je      .L" + (string labels.[nesting-1]) + "\n";
+        ]
+
+    let compileRB (_ : unit) = 
+        nesting <- nesting - 2
+        let s = [
+            "jmp     .L" + (string labels.[nesting]) + "\n";
+            ".L" + (string labels.[nesting+1]) + ":\n";
+        ]
+        labels <- List.filter (fun el -> el <> labels.[nesting] && el <> labels.[nesting+1]) labels
+        s
+
+
+    let compileIncPtr (i : int) =
+        ptr <- ptr + i
+        [
+            "addq    $" + (string i) + ", -8(%rbp)\n"
+        ]
+
+    let compileDecPtr (i : int) =
+        ptr <- ptr - i
+        [
+            "subq    $" + (string i) + ", -8(%rbp)\n"
+        ]
+
+    let compileIncLoc (i : int) =
+        [
+            "movq    -8(%rbp), %rax\n";
+            "movzbl  (%rax), %eax\n";
+            "addl    $"+ (string i) + ", %eax\n";
+            "movl    %eax, %edx\n";
+            "movq    -8(%rbp), %rax\n";
+            "movb    %dl, (%rax)\n";
+        ]
+
+    let compileDecLoc (i : int) =
+        [
+            "movq    -8(%rbp), %rax\n";
+            "movzbl  (%rax), %eax\n";
+            "subl    $"+ (string i) + ", %eax\n";
+            "movl    %eax, %edx\n";
+            "movq    -8(%rbp), %rax\n";
+            "movb    %dl, (%rax)\n";
+        ]
+
+    let compileAdd (i : int) (loc : int) =
+        [
+            "movq    -8(%rbp), %rax\n";
+            "addq    $" + (string loc) + ", %rax\n";
+            "movzbl  (%rax), %eax\n";
+            "leal    "+ (string i) + "(%rax), %edx\n";
+            "movq    -8(%rbp), %rax\n";
+            "addq    $" + (string loc) + ", %rax\n";
+            "movb    %dl, (%rax)\n";
+        ]
+
+    let compileSub (i : int) (loc : int) =
+        [
+            "movq    -8(%rbp), %rax\n";
+            "addq    $" + (string loc) + ", %rax\n";
+            "movzbl  (%rax), %eax\n";
+            "leal    -"+ (string i) + "(%rax), %edx\n";
+            "movq    -8(%rbp), %rax\n";
+            "addq    $" + (string loc) + ", %rax\n";
+            "movb    %dl, (%rax)\n";
+        ]
+
+    let compileSet (i : int) (loc : int) =
+        [
+            "movq    -8(%rbp), %rax\n";
+            "addq    $" + (string loc) + ", %rax\n";
+            "movb    $" + (string i) + ", (%rax)\n";
+        ]
+
+    let compilePut =
+        [
+            "movq    -8(%rbp), %rax\n";
+            "movzbl  (%rax), %eax\n";
+            "movsbl  %al, %eax\n";
+            "movl    %eax, %edi\n";
+            "call    putchar\n";
+        ]
+
+    let compileGet = 
+        [
+            "call    getchar\n";
+            "movl    %eax, %edx\n";
+            "movq    -8(%rbp), %rax\n";
+            "movb    %dl, (%rax)\n";
+        ]
 
     let compileInstruction (token : Token) = 
         match token with
         | (LB, _) -> 
-            nesting <- nesting + 1
-            sprintf "%Awhile (*ptr) { \n" (List.init (nesting - 1) (fun el -> "\t") |> List.reduce (+))
+            compileLB()
         | (RB, _) -> 
-            nesting <- nesting - 1
-            sprintf "%A} \n" (List.init (nesting + 1) (fun el -> "\t") |> List.reduce (+))
+            compileRB()
         | (IncPtr, i) -> 
-            ptr <- ptr + i
-            sprintf "%Aptr += %A; \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) i 
+            compileIncPtr i
         | (DecPtr, i) -> 
-            ptr <- ptr - i
-            sprintf "%Aptr -= %A; \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) i 
-        | (IncLoc, i) -> 
-            sprintf "%Aptr[%A] += %A; \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) ptr i
+            compileDecPtr i
+        | (IncLoc, i) ->
+            compileIncLoc i
         | (DecLoc, i) -> 
-            sprintf "%Aptr[%A] -= %A; \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) ptr i
+            compileDecLoc i
         | (Write, _) -> 
-            sprintf "%Aputchar(*ptr); \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+))
+            compilePut
         | (Get, _) -> 
-            sprintf "%A*ptr = Get(); \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+))
+            compileGet
         | (Set x, y) -> 
-            sprintf "%Aptr[%A] = %A \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) (ptr + y - 1) x
+            compileSet x (ptr + y - 1)
         | (Add (x, y), _) -> 
-            sprintf "%Aptr[%A] += %A \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) (ptr + x) y
+            compileAdd y (ptr + x - 1)
         | (Sub (x, y), _) -> 
-            sprintf "%Aptr[%A] -= %A \n" (List.init (nesting) (fun el -> "\t") |> List.reduce (+)) (ptr + x) y
-    
+            compileSub y (ptr + x - 1)
+
+    let headerStuff = [
+        ".data\n";
+        ".text\n";
+        ".global main\n\n";
+        "main:\n";
+        "    pushq   %rbp\n";
+        "    movq    %rsp, %rbp\n";
+        "    subq    $30016, %rsp\n";
+        "    movq    $0, -30016(%rbp)\n";
+        "    movq    $0, -30008(%rbp)\n";
+        "    leaq    -30000(%rbp), %rax\n";
+        "    movl    $29984, %edx\n";
+        "    movl    $0, %esi\n";
+        "    movq    %rax, %rdi\n";
+        "    call    memset\n";
+        "    leaq    -30016(%rbp), %rax\n";
+        "    movq    %rax, -8(%rbp)\n";
+    ]
+
     match input with
     | Ok x ->
         x 
-        |> List.map compileInstruction
-        |> List.append ["#include <stdio.h> \n\n"; "#define SIZE 30000 \n\n"; "int main(void) { \n"; "\tchar array[SIZE] = {0}; \n"; "\tchar *ptr = array; \n\n"]
+        |> List.collect compileInstruction
+        |> List.map (fun s -> "    " + s)
+        |> List.append headerStuff
         |> List.reduce (+)
-        |> fun el -> el + "\n\treturn 0; \n} \n"
+        |> fun s -> s + "    movl $0, %eax\n    leave\n    ret"
         |> Ok
     | Error e -> e |> Error
+
