@@ -18,19 +18,37 @@ open Compiler
 [<EntryPoint>]
 let main argv =
     
-    Console.Write("Input brainfuck string: ")
-    let input = Console.ReadLine()
-    Console.Write("\n")
+    let input, saveToFile = 
+        match Array.length argv with
+        | 1 -> 
+            Console.Write("Input brainfuck string: ")
+            Console.ReadLine(), false
+        | 2 -> 
+            if IO.File.Exists (argv.[1] + ".bf")
+            then IO.File.ReadAllText (argv.[1] + ".bf"), true
+            else failwithf "%A.bf does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
+        | _ -> failwithf "You must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n"
     
-    let test = 
-        input
-        |> tokenise
-        |> optimise true
-        |> compile
-        |> function
-            | Ok x -> x
-            | Error er -> er |> string |> (+) "Error: "
-    printf "%A \n" test
+    input
+    |> tokenise
+    |> optimise true
+    |> compile
+    |> function
+        | Ok code ->
+            match saveToFile with
+            | true ->
+                code
+                |> fun asm -> 
+                    let compileMessage = sprintf "Compiled " + string argv.[1] + ".bf to " + string argv.[1] + ".s"
+                    IO.File.WriteAllLines (@"" + argv.[1] + ".s", [asm])
+                    printfn "%s" compileMessage
+            | false ->
+                Console.Write("\n")
+                printfn "%A" code
+        | Error er -> 
+            er 
+            |> string 
+            |> failwithf "Error: %A"    
     
-    System.Console.ReadKey() |> ignore
+
     0 // return an integer exit code
