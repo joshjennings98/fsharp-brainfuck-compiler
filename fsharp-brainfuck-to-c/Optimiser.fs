@@ -10,7 +10,7 @@ open Types
 
 let optimise (optimiseCode : bool) (input : Instruction list) : Result<Token list, SyntaxError> =
     let concatIncrDecr (x : Instruction) = function
-        | (i, count) :: t when i = x && i <> LB && i <> RB -> (i, count + 1) :: t 
+        | (i, count) :: t when i = x && i <> LB && i <> RB && i <> Write && i <> Get -> (i, count + 1) :: t 
         | t -> (x, 1) :: t
     
     let mergeSuccessiveIncrDecr (list : Token list) = 
@@ -49,6 +49,7 @@ let optimise (optimiseCode : bool) (input : Instruction list) : Result<Token lis
     let simplifyAddSub (list : Token list) = 
         let rec loop acc list =
             match list with 
+            
             | x1::x2::x3::xs -> 
                 let instr1, instr2, instr3, val1, val2, val3 =
                     fst x1, fst x2, fst x3, snd x1, snd x2, snd x3
@@ -100,7 +101,7 @@ let optimise (optimiseCode : bool) (input : Instruction list) : Result<Token lis
 
                 | IncPtr, DecLoc, IncPtr ->
                     let sub1 = 
-                        Add (val1, val2), 1
+                        Sub (val1, val2), 1
                     let newToken =
                         IncPtr, val3 + val1
                     loop acc (sub1::newToken::xs)
@@ -185,5 +186,6 @@ let optimise (optimiseCode : bool) (input : Instruction list) : Result<Token lis
         | RB -> acc - 1
         | _ -> acc
     ) 0 tokenList) = 0
-    then Ok tokenList
+    then 
+        Ok tokenList
     else Error ``Unclosed brackets``
