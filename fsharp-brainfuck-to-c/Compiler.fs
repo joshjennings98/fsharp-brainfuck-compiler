@@ -8,14 +8,14 @@ module Compiler
 open Types
 
 
-let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxError> =
-    let mutable ptr = 0
-    let mutable ctr = 1
-    let mutable nesting = 0
-    let mutable labels = []
+let compile (arraySize : int) (input : Result<Token list, SyntaxError>) : Result<string, SyntaxError> =
+    let mutable ptr = 0 // Pointer location
+    let mutable ctr = 1 // Count of the number of labels used so that there aren't repetition
+    let mutable nesting = 0 // The current nesting of the program, based on '[' and ']'
+    let mutable labels = [] // List of labels currently in use. Indexed using ctr
 
     let compileLB (_ : unit) = 
-        nesting <- nesting + 2
+        nesting <- nesting + 2 // Increment by 2 to account for start and end loop labels
         labels <- List.append labels [ctr; ctr+1]
         ctr <- ctr + 2
         [
@@ -28,31 +28,31 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
 
     let compileRB (_ : unit) = 
         nesting <- nesting - 2
-        let s = [
+        let instr = [
             "jmp     .L" + (string labels.[nesting]) + "\n";
             ".L" + (string labels.[nesting+1]) + ":\n";
         ]
         labels <- List.filter (fun el -> el <> labels.[nesting] && el <> labels.[nesting+1]) labels
-        s
+        instr
 
 
     let compileIncPtr (i : int) =
         ptr <- ptr + i
         [
-            "addq    $" + (string i) + ", -8(%rbp)\n"
+            "addq    $" + (string (i % 256)) + ", -8(%rbp)\n" // modulo to act as byte wrapping
         ]
 
     let compileDecPtr (i : int) =
         ptr <- ptr - i
         [
-            "subq    $" + (string i) + ", -8(%rbp)\n"
+            "subq    $" + (string (i % 256)) + ", -8(%rbp)\n"
         ]
 
     let compileIncLoc (i : int) =
         [
             "movq    -8(%rbp), %rax\n";
             "movzbl  (%rax), %eax\n";
-            "addl    $"+ (string i) + ", %eax\n";
+            "addl    $"+ (string (i % 256)) + ", %eax\n";
             "movl    %eax, %edx\n";
             "movq    -8(%rbp), %rax\n";
             "movb    %dl, (%rax)\n";
@@ -62,7 +62,7 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
         [
             "movq    -8(%rbp), %rax\n";
             "movzbl  (%rax), %eax\n";
-            "subl    $"+ (string i) + ", %eax\n";
+            "subl    $"+ (string (i % 256)) + ", %eax\n";
             "movl    %eax, %edx\n";
             "movq    -8(%rbp), %rax\n";
             "movb    %dl, (%rax)\n";
@@ -73,7 +73,7 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
             "movq    -8(%rbp), %rax\n";
             "addq    $" + (string loc) + ", %rax\n";
             "movzbl  (%rax), %eax\n";
-            "leal    "+ (string i) + "(%rax), %edx\n";
+            "leal    "+ (string (i % 256)) + "(%rax), %edx\n";
             "movq    -8(%rbp), %rax\n";
             "addq    $" + (string loc) + ", %rax\n";
             "movb    %dl, (%rax)\n";
@@ -84,7 +84,7 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
             "movq    -8(%rbp), %rax\n";
             "addq    $" + (string loc) + ", %rax\n";
             "movzbl  (%rax), %eax\n";
-            "leal    -"+ (string i) + "(%rax), %edx\n";
+            "leal    -"+ (string (i % 256)) + "(%rax), %edx\n";
             "movq    -8(%rbp), %rax\n";
             "addq    $" + (string loc) + ", %rax\n";
             "movb    %dl, (%rax)\n";
@@ -94,7 +94,7 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
         [
             "movq    -8(%rbp), %rax\n";
             "addq    $" + (string loc) + ", %rax\n";
-            "movb    $" + (string i) + ", (%rax)\n";
+            "movb    $" + (string (i % 256)) + ", (%rax)\n";
         ]
 
     let compilePut =
@@ -139,22 +139,22 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
         | (Sub (x, y), _) -> 
             compileSub y (ptr + x - 1)
 
-    let headerStuff = [
+    let headerStuff (size : int) = [
         ".data\n";
         ".text\n";
         ".global main\n\n";
         "main:\n";
         "    pushq   %rbp\n";
         "    movq    %rsp, %rbp\n";
-        "    subq    $30016, %rsp\n";
-        "    movq    $0, -30016(%rbp)\n";
-        "    movq    $0, -30008(%rbp)\n";
-        "    leaq    -30000(%rbp), %rax\n";
-        "    movl    $29984, %edx\n";
+        "    subq    $" + (size |> (+) 16 |> string) + ", %rsp\n";
+        "    movq    $0, -" + (size |> (+) 16 |> string) + "(%rbp)\n";
+        "    movq    $0, -" + (size |> (+) 8 |> string) + "(%rbp)\n";
+        "    leaq    -" + (size |> string) + "(%rbp), %rax\n";
+        "    movl    $" + (16 |> (-) size |> string) + ", %edx\n";
         "    movl    $0, %esi\n";
         "    movq    %rax, %rdi\n";
         "    call    memset\n";
-        "    leaq    -30016(%rbp), %rax\n";
+        "    leaq    -" + (size |> (+) 16 |> string) + "(%rbp), %rax\n";
         "    movq    %rax, -8(%rbp)\n";
     ]
 
@@ -163,9 +163,8 @@ let compile (input : Result<Token list, SyntaxError>) : Result<string, SyntaxErr
         x 
         |> List.collect compileInstruction
         |> List.map (fun s -> "    " + s)
-        |> List.append headerStuff
+        |> List.append (headerStuff arraySize)
         |> List.reduce (+)
         |> fun s -> s + "    movl $0, %eax\n    leave\n    ret"
         |> Ok
     | Error e -> e |> Error
-
