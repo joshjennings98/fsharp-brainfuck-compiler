@@ -1,11 +1,14 @@
-# fsharp-brainfuck-to-C
-Transpile Brainfuck to C. Implemented in F#.
+# fsharp-brainfuck-compiler
 
-This code is purposefully written quite verbosely since brainfuck compilers have been made that are only 100 - 200 bytes so there is no point in making it super small.
+An optimising brainfuck to x86 assembly compiler written in F#.
 
-To remove optimisations, set the `optimise` variable to false.
+To remove optimisations, add the `no-optimise` argument.
 
-To change the array size, change the `SIZE` variable to the desired value.
+To change the array size, add the `SIZE` as the desired value.
+
+Use the name of the brainfuck file as the first argument.
+
+For a hello world example, see the included shell script `test.sh`.
 
 ## Types.fs
 
@@ -41,10 +44,4 @@ This module is the entrance to the program. This module interprets any input arg
 ## Notes
 
 *Ideas for optimisations came from https://www.nayuki.io/page/optimizing-brainfuck-compiler*
-
-**To Do:** 
-* Account for wrapping of bytes.
-* Add compile arguments for brainfuck such as array size.
-* Add file input and output rather than just terminal input.
-* Add more optimisations.
 
