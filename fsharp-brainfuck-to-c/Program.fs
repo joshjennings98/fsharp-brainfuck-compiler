@@ -17,18 +17,25 @@ let main argv =
             Console.ReadLine(), false, true, 30000
         | 2 -> 
             if IO.File.Exists argv.[1]
-            then IO.File.ReadAllText argv.[1], true, true, 30000
-            else failwithf "%s does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
+            then 
+                IO.File.ReadAllText argv.[1], true, true, 30000
+            else 
+                failwithf "%s does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
         | 3 -> 
             if IO.File.Exists argv.[1]
             then 
                 let optimise, size =
                     match argv.[2] with
-                    | "no-optimise" -> false, 30000
-                    | x when fst (System.Double.TryParse(x)) -> true, (int x)
-                    | _ -> true, 30000
+                    | "no-optimise" ->
+                         false, 30000
+                    | x when fst (System.Double.TryParse(x)) -> 
+                        true, (int x)
+                    | _ -> 
+                        true, 30000
+                
                 IO.File.ReadAllText argv.[1], true, optimise, size
-            else failwithf "%s does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
+            else 
+                failwithf "%s does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
         | 4 ->
             if IO.File.Exists argv.[1]
             then 
@@ -42,12 +49,15 @@ let main argv =
                         if (int y) > 15
                         then true, (int y)
                         else failwithf "Minimum array size is 16.\n"
-                    | _ -> failwithf "If providing 3 arguments, you must first provide the filename and then whether to optimise and the size of the array.\n"
+                    | _ -> 
+                        failwithf "If providing 3 arguments, you must first provide the filename and then whether to optimise and the size of the array.\n"
+                
                 IO.File.ReadAllText argv.[1], true, optimise, size
-            else failwithf "%s does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
+            else 
+                failwithf "%s does not exist.\nYou must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n" argv.[1]
+        | _ -> 
+            failwithf "You must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n"
 
-        | _ -> failwithf "You must either provide an input brainfuck file (without extension) or no file at all for the interactive version.\n"
-        
     input
     |> tokenise
     |> optimise optimiseBool
