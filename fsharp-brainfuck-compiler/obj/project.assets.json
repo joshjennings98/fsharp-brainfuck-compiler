@@ -784,28 +784,26 @@
     ]
   },
   "packageFolders": {
-    "/home/josh/.nuget/packages/": {},
-    "/usr/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\Josh\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/josh/fsharp-brainfuck-to-C/fsharp-brainfuck-to-c/fsharp-brainfuck-to-c.fsproj",
-      "projectName": "fsharp-brainfuck-to-c",
-      "projectPath": "/home/josh/fsharp-brainfuck-to-C/fsharp-brainfuck-to-c/fsharp-brainfuck-to-c.fsproj",
-      "packagesPath": "/home/josh/.nuget/packages/",
-      "outputPath": "/home/josh/fsharp-brainfuck-to-C/fsharp-brainfuck-to-c/obj/",
+      "projectUniqueName": "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-compiler\\fsharp-brainfuck-compiler\\fsharp-brainfuck-compiler.fsproj",
+      "projectName": "fsharp-brainfuck-compiler",
+      "projectPath": "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-compiler\\fsharp-brainfuck-compiler\\fsharp-brainfuck-compiler.fsproj",
+      "packagesPath": "C:\\Users\\Josh\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Josh\\Documents\\GitHub\\fsharp-brainfuck-compiler\\fsharp-brainfuck-compiler\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "/usr/share/dotnet/sdk/NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "/home/josh/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Josh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.1"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -819,15 +817,13 @@
         "dependencies": {
           "FSharp.Core": {
             "target": "Package",
-            "version": "[4.7.0, )",
-            "generatePathProperty": true
+            "version": "[4.7.0, )"
           },
           "Microsoft.NETCore.App": {
             "suppressParent": "All",
             "target": "Package",
             "version": "[2.1.0, )",
-            "autoReferenced": true,
-            "generatePathProperty": true
+            "autoReferenced": true
           }
         },
         "imports": [
@@ -840,7 +836,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.201/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
       }
     }
   }

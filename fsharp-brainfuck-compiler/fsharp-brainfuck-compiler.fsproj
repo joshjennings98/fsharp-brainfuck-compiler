@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RootNamespace>fsharp_brainfuck_to_c</RootNamespace>
+    <RootNamespace>fsharp_brainfuck_compiler</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
