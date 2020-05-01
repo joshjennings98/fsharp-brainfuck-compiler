@@ -172,7 +172,7 @@ let optimise (optimiseCode : bool) (input : Instruction list) : Result<Token lis
                  el
                  |> List.foldBack concatIncrDecr input
                  |> mergeSuccessiveIncrDecr
-                 |> simplifyAddSub
+                 //|> simplifyAddSub
                  |> removeBeforeSet
                  |> List.map fixIncrDecr
                  |> List.filter (fun el -> snd el <> 0)

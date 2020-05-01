@@ -1,4 +1,4 @@
-# fsharp-brainfuck-compiler
+# F# Brainfuck Compiler
 
 An optimising brainfuck to x86 assembly compiler written in F#.
 
