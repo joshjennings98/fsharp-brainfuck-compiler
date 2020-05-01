@@ -199,7 +199,3 @@ sh test.sh
 ## Acknowledgements
 
 Ideas for optimisations came from [https://www.nayuki.io/page/optimizing-brainfuck-compiler](https://www.nayuki.io/page/optimizing-brainfuck-compiler)
-
-## GitHub Repository
-
-The full project can be viewed on [GitHub.](https://github.com/joshjennings98/fsharp-brainfuck-compiler)
