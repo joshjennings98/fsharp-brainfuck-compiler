@@ -32,7 +32,12 @@ let compile (arraySize : int) (input : Result<Token list, SyntaxError>) : Result
             "jmp     .L" + (string labels.[nesting]) + "\n";
             ".L" + (string labels.[nesting+1]) + ":\n";
         ]
-        labels <- List.filter (fun el -> el <> labels.[nesting] && el <> labels.[nesting+1]) labels
+        
+        labels <- List.filter (fun el -> 
+            el <> labels.[nesting] && 
+            el <> labels.[nesting+1]
+            ) labels
+        
         instr
 
 

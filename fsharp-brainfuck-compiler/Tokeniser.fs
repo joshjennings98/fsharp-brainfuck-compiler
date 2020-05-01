@@ -25,7 +25,7 @@ let tokenise (input : string) : Instruction list =
         | '-' -> DecLoc
         | '.' -> Write
         | ',' -> Get
-        | _ -> failwithf "Won't happen since all other characters are filtered out prior to this being called."
+        | _ -> failwithf "Shouldn't happen since all other characters are filtered out prior to this branch being evaluated."
     
     input 
     |> Seq.toList 

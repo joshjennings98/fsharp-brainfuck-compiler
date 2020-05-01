@@ -10,6 +10,7 @@ open Compiler
 [<EntryPoint>]
 let main argv =
     
+    // Note: if using visual studio, it won't recognise file even if you specify it as an argument.
     let input, saveToFile, optimiseBool, size = 
         match Array.length argv with
         | 1 -> 
